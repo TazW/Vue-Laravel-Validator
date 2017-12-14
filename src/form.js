@@ -1,6 +1,6 @@
 import Error from './error';
 
-export default class{
+export default class {
 
     constructor(fields, $http) {
         this.$fields = fields;
@@ -10,42 +10,43 @@ export default class{
     }
 
 
-    post (uri, options) {
+    post(uri, options) {
         return this.request('post', uri, options);
     }
 
-    patch (uri, options) {
+    patch(uri, options) {
         return this.request('patch', uri, options);
     }
 
-    put (uri, options) {
+    put(uri, options) {
         return this.request('put', uri, options);
     }
 
-    setBusy(status){
+    setBusy(status) {
         this.$busy = status;
     }
 
-    setError(errors){
+    setError(errors) {
         this.$errors = new Error(errors);
     }
 
-    request (method, uri, options) {
+    request(method, uri, options) {
         this.setError({});
-        var vm = this;
-        
+        let vm = this;
+
         return new Promise(function (resolve, reject) {
             vm.setBusy(true);
-
-            vm.$http[method](uri, vm.$fields, options).then((response) => {
+            axios[method](uri, vm.$fields, options).then((response) => {
                 resolve(response);
-            }, (response) => {
+            }).catch((error) => {
+                if (typeof error.response.data.errors === "object")
+                    vm.setError(error.response.data.errors);
+                else
+                    vm.setError(error.response.data);
 
-                vm.setError(response.data);
+                reject(error);
 
-                reject(response);
-
-            }).finally(() => {
+            }).then(() => {
                 vm.setBusy(false);
             });
 
