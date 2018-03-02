@@ -30,6 +30,10 @@ export default class {
         this.$errors = new Error(errors);
     }
 
+    setFields(fields) {
+        this.$fields = fields;
+    }
+
     request(method, uri, options) {
         this.setError({});
         let vm = this;
